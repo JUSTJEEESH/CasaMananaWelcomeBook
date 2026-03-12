@@ -1388,13 +1388,17 @@ def pg_language(c):
 
 # ── 19. THINGS THAT SURPRISED US ───────────────────────────────────────────
 def pg_surprises(c):
-    fill_page(c, HexColor("#FDFAF3"))
-    c.setFillColor(HexColor("#8B6C14")); c.rect(0, H - 0.95*inch, W, 0.95*inch, fill=1, stroke=0)
-    txt(c, M, H - 0.54*inch, "A Few Things That Surprised Us", "PopB", 22, WHITE)
-    txt(c, M, H - 0.76*inch, "We moved here in April 2025. Here's what we didn't expect.",
-        "PopL", 9.5, HexColor("#D4AE60"))
+    fill_page(c)
+    c.setFillColor(TEAL); c.rect(0, H - 4, W, 4, fill=1, stroke=0)
+    y_top = H - 0.68*inch
+    y_top = pill_label(c, M, y_top, "REFLECTIONS", bg=TEAL_SOFT, fg=TEAL_DARK)
+    txt(c, M, y_top, "A Few Things That Surprised Us", "PopB", 26, CHARCOAL)
+    y_top -= 10
+    txt(c, M, y_top - 4, "We moved here in April 2025. Here's what we didn't expect.",
+        "Pop", 10, TEXT_GRAY)
 
-    y = H - 1.12*inch
+    y = y_top - 22
+    hrule(c, M, y, CW, BORDER_SOFT); y -= 14
     col = (CW - 16) / 2
     lx, rx = M, M + col + 16
 
@@ -1436,14 +1440,14 @@ def pg_surprises(c):
         txt(c, tx, ty, title, "PopB", 9.5, CHARCOAL); ty -= 13
         ty = wraptext(c, tx, ty, body, "Pop", 9, TEXT_GRAY, col, 13.5)
         ty -= 10
-        hrule(c, tx, ty, col * 0.35, HexColor("#C9A030"), 0.6)
+        hrule(c, tx, ty, col * 0.35, TEAL_MED, 0.6)
         ty -= 12
         if i % 2 == 0: y_l = ty
         else: y_r = ty
 
     y = min(y_l, y_r) - 6
-    rbox(c, M, y, CW, 38, HexColor("#F2E8CC"), r=8)
-    c.setFillColor(HexColor("#8B6C14")); c.roundRect(M, y - 38, 4, 38, 2, fill=1, stroke=0)
+    rbox(c, M, y, CW, 38, TEAL_SOFT, r=8)
+    c.setFillColor(TEAL); c.roundRect(M, y - 38, 4, 38, 2, fill=1, stroke=0)
     txt(c, M + 16, y - 13, "This place was built in 2016. We've only been here a year.", "PopB", 9.5, CHARCOAL)
     txt(c, M + 16, y - 28, "But we already can't imagine being anywhere else. We're really glad you're in it with us.",
         "Pop", 9, TEXT_GRAY)
