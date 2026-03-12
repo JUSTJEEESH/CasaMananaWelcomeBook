@@ -123,13 +123,26 @@ def footer(c, n=None):
         txt(c, W - M, 0.34*inch, str(n), "PopL", 7.5, TEXT_GRAY, "right")
 
 def pill_label(c, x, y, label, bg=PINK_SOFT, fg=PINK):
-    """Small pill section label above heading — y is TOP of pill."""
-    lw = c.stringWidth(label, "PopM", 7.5) + 20
-    # Draw pill: x, bottom-left y, width, height
+    """
+    Draws a small pill tag, then returns the y coordinate for the
+    HEADING that should appear directly below it.
+
+    y = the TOP of the pill (i.e., where you want the pill to start)
+    The pill is 18pt tall with 8.5pt corner radius.
+    There should be 8pt gap between pill bottom and heading baseline.
+    """
+    lw = c.stringWidth(label, "PopM", 7.5) + 22
+    pill_top = y
+    pill_bottom = y - 18
+    # Draw pill
     c.setFillColor(bg)
-    c.roundRect(x, y - 17, lw, 17, 8.5, fill=1, stroke=0)
-    txt(c, x + 10, y - 13, label, "PopM", 7.5, fg)
-    return y - 26   # return y for next element (heading)
+    c.roundRect(x, pill_bottom, lw, 18, 9, fill=1, stroke=0)
+    # Draw label text — vertically centered in pill
+    c.setFont("PopM", 7.5)
+    c.setFillColor(fg)
+    c.drawString(x + 11, pill_bottom + 5, label)
+    # Return y for heading baseline (8pt below pill bottom)
+    return pill_bottom - 8
 
 def dark_band(c, y, h, col=CHARCOAL):
     c.setFillColor(col); c.rect(0, y, W, h, fill=1, stroke=0)
@@ -334,21 +347,38 @@ def pg_first_day(c):
          "Tomorrow you hit the ground running. Tonight, just land."),
     ]
 
-    for i, (time_s, title, body) in enumerate(steps):
-        if i > 0:
-            c.setStrokeColor(BORDER_SOFT); c.setLineWidth(0.8); c.setDash(2, 4)
-            c.line(M + 28, y + 2, M + 28, y + 16); c.setDash()
+    PILL_W = 76   # fixed width for all time pills — wide enough for "4:30 PM"
+    PILL_H = 18
+    GAP = 10      # gap between pill right edge and title start
+    TITLE_X = M + PILL_W + GAP
+    TITLE_WRAP_W = CW - PILL_W - GAP   # remaining width after pill
 
-        # Time pill — fixed width, stays within margin
-        pw = 72  # fixed pill width
-        pill(c, M, y - 16, pw, 17, TEAL)
-        txt(c, M + pw/2, y - 11, time_s, "PopB", 7.5, WHITE, "center")
-        # Title on same line, after pill
-        txt(c, M + pw + 10, y - 4, title, "PopB", 10.5, CHARCOAL)
-        y -= 20
-        # Body indented to align with title
-        y = wraptext(c, M + pw + 10, y, body, "Pop", 9, TEXT_GRAY, CW - pw - 10, 13.5)
-        y -= 10
+    for i, (time_s, title, body) in enumerate(steps):
+        # Dashed connector line between steps
+        if i > 0:
+            c.setStrokeColor(BORDER_SOFT)
+            c.setLineWidth(0.8)
+            c.setDash(2, 4)
+            c.line(M + PILL_W/2, y + 2, M + PILL_W/2, y + 12)
+            c.setDash()
+
+        # Time pill — centered horizontally within PILL_W
+        c.setFillColor(TEAL)
+        c.roundRect(M, y - PILL_H, PILL_W, PILL_H, PILL_H/2, fill=1, stroke=0)
+        c.setFont("PopB", 7.5)
+        c.setFillColor(WHITE)
+        c.drawCentredString(M + PILL_W/2, y - PILL_H + 5, time_s)
+
+        # Title — aligned with pill top, never exceeds right margin
+        c.setFont("PopB", 10.5)
+        c.setFillColor(CHARCOAL)
+        c.drawString(TITLE_X, y - 5, title)  # y-5 puts it near pill top
+
+        y -= PILL_H + 4  # move below pill
+
+        # Body text — same x as title, same wrap width
+        y = wraptext(c, TITLE_X, y, body, "Pop", 9, TEXT_GRAY, TITLE_WRAP_W, 13.5)
+        y -= 12
 
     y -= 6
     rbox(c, M, y, CW, 28, GRAY_BG, r=8)
@@ -639,11 +669,15 @@ def pg_food_wb(c):
     txt(c, M, y - 4, "We've eaten our way around this island. Here's the honest list.", "Pop", 10, TEXT_GRAY)
     y -= 22; hrule(c, M, y, CW, BORDER_SOFT); y -= 12
 
-    pw = c.stringWidth("IN WEST BAY", "PopB", 8) + 26
+    BADGE_H = 20
+    BADGE_TEXT = "IN WEST BAY"
+    badge_w = c.stringWidth(BADGE_TEXT, "PopB", 8.5) + 28
     c.setFillColor(CHARCOAL)
-    c.roundRect(M, y - 20, pw, 18, 9, fill=1, stroke=0)
-    txt(c, M + 13, y - 15, "IN WEST BAY", "PopB", 8, WHITE)
-    y -= 32
+    c.roundRect(M, y - BADGE_H, badge_w, BADGE_H, BADGE_H/2, fill=1, stroke=0)
+    c.setFont("PopB", 8.5)
+    c.setFillColor(WHITE)
+    c.drawString(M + 14, y - BADGE_H + 5.5, BADGE_TEXT)
+    y -= BADGE_H + 14
 
     y = restaurant_entry(c, M, y, CW, "Beachers Bar & Grill",
         "Right on the beach · Locally owned, 15+ years",
@@ -682,11 +716,15 @@ def pg_food_we(c):
     txt(c, W - M, H - 0.36*inch, "continued", "PopI", 9, TEXT_GRAY, "right")
 
     y = H - 0.73*inch
-    pw = c.stringWidth("IN WEST END", "PopB", 8) + 26
+    BADGE_H = 20
+    BADGE_TEXT = "IN WEST END"
+    badge_w = c.stringWidth(BADGE_TEXT, "PopB", 8.5) + 28
     c.setFillColor(CHARCOAL)
-    c.roundRect(M, y - 20, pw, 18, 9, fill=1, stroke=0)
-    txt(c, M + 13, y - 15, "IN WEST END", "PopB", 8, WHITE)
-    y -= 32
+    c.roundRect(M, y - BADGE_H, badge_w, BADGE_H, BADGE_H/2, fill=1, stroke=0)
+    c.setFont("PopB", 8.5)
+    c.setFillColor(WHITE)
+    c.drawString(M + 14, y - BADGE_H + 5.5, BADGE_TEXT)
+    y -= BADGE_H + 14
 
     y = restaurant_entry(c, M, y, CW, "Sandy Buns Bakery & Cafe",
         "Run by Tim & Shantal · Texan expats · West End",
@@ -1029,93 +1067,111 @@ def pg_rainy(c):
 
 # ── 15. STARGAZING ──────────────────────────────────────────────────────────
 def pg_stars(c):
-    """Stargazing — dark charcoal background, fully on-brand, all content within margins."""
+    # Background: charcoal (on-brand)
     fill_page(c, CHARCOAL)
 
-    # Subtle star field — kept well inside page area
-    random.seed(42)
-    for _ in range(160):
-        sx = random.uniform(M * 0.8, W - M * 0.8)
-        sy = random.uniform(H * 0.22, H - 1.0*inch)
-        sr = random.uniform(0.35, 1.5)
-        br = random.randint(120, 200)
-        c.setFillColor(HexColor(f"#{br:02X}{br:02X}{min(br+8,255):02X}"))
+    # Subtle star field — ONLY within the safe content area
+    # x: between M and W-M (within margins)
+    # y: between footer area (0.8*inch) and top band (H - 0.8*inch)
+    import random
+    random.seed(99)
+    for _ in range(140):
+        sx = random.uniform(M, W - M)
+        sy = random.uniform(0.8*inch, H - 0.9*inch)
+        sr = random.uniform(0.3, 1.4)
+        br = random.randint(100, 180)
+        c.setFillColor(HexColor(f"#{br:02X}{br:02X}{min(br+6,255):02X}"))
         c.circle(sx, sy, sr, fill=1, stroke=0)
 
-    # Teal/pink strips (consistent with all pages)
-    c.setFillColor(TEAL); c.rect(0, H - 5, W, 5, fill=1, stroke=0)
+    # Standard teal/pink strips
+    c.setFillColor(TEAL); c.rect(0, H-5, W, 5, fill=1, stroke=0)
     c.setFillColor(PINK); c.rect(0, 0, W, 5, fill=1, stroke=0)
 
-    # Page heading — constrained to margins
-    y = H - 0.72*inch
-    txt(c, W/2, y, "Look Up Tonight.", "PopB", 36, WHITE, "center")
-    tw = c.stringWidth("Look Up Tonight.", "PopB", 36)
-    c.setStrokeColor(TEAL); c.setLineWidth(2.5)
-    c.line(W/2 - tw/2, y - 8, W/2 + tw/2, y - 8)
-    y -= 28
+    # --- ALL CONTENT STRICTLY WITHIN M to M+CW horizontally ---
 
-    y = wraptext(c, M, y,
+    # Heading
+    y = H - 0.72*inch
+    c.setFont("PopB", 34)
+    c.setFillColor(WHITE)
+    c.drawCentredString(W/2, y, "Look Up Tonight.")
+    # Teal underline
+    tw = c.stringWidth("Look Up Tonight.", "PopB", 34)
+    c.setStrokeColor(TEAL); c.setLineWidth(2.5)
+    c.line(W/2 - tw/2, y - 7, W/2 + tw/2, y - 7)
+    y -= 30
+
+    # Intro lines — use wraptext with x=W/2 for center, max_w=CW
+    y = wraptext(c, W/2, y,
         "One thing people don't expect: the sky here at night.",
         "PopI", 11, TEAL_MED, CW, 16, "center")
     y -= 8
-
-    y = wraptext(c, M, y,
-        "We're far from any major city's light pollution. On a clear night — which is most "
-        "nights outside of rainy season — the stars are genuinely stunning. "
-        "The Milky Way is visible on moonless nights. "
-        "You can spot satellites with the naked eye if you're patient.",
+    y = wraptext(c, W/2, y,
+        "We're far from any city's light pollution. On a clear night — most nights "
+        "outside of rainy season — the Milky Way is visible. "
+        "You can spot satellites with the naked eye.",
         "Pop", 10, HexColor("#9AAFBA"), CW, 15, "center")
-    y -= 28
+    y -= 26
 
-    # Three step cards — fixed width, properly positioned
-    card_w = (CW - 24) / 3
-    card_h = 72
-    card_y = y
-    for i, (num, label) in enumerate([
-        ("1", "Turn off the\npool lights."),
-        ("2", "Let your eyes\nadjust 5 min."),
-        ("3", "Look up."),
+    # Three step cards — equal width, side by side, strictly within CW
+    card_w = (CW - 20) / 3   # 20 = 2 gaps of 10pt each
+    card_h = 78
+    for i, (num, line1, line2) in enumerate([
+        ("1", "Turn off the", "pool lights."),
+        ("2", "Let your eyes", "adjust 5 min."),
+        ("3", "Look up.", ""),
     ]):
-        bx = M + i * (card_w + 12)
+        bx = M + i * (card_w + 10)
+        # Card background
         c.setFillColor(HexColor("#252527"))
-        c.roundRect(bx, card_y - card_h, card_w, card_h, 10, fill=1, stroke=0)
-        # Number circle
+        c.roundRect(bx, y - card_h, card_w, card_h, 10, fill=1, stroke=0)
+        # Circle with number
+        circle_cx = bx + card_w / 2
+        circle_cy = y - 18
         c.setFillColor(TEAL)
-        c.circle(bx + card_w/2, card_y - 16, 13, fill=1, stroke=0)
-        txt(c, bx + card_w/2, card_y - 20.5, num, "PopB", 11, WHITE, "center")
-        # Label (split on newline)
-        lines = label.split("\n")
-        ly = card_y - 42
-        col = WHITE if num == "3" else TEAL_MED
-        for line in lines:
-            txt(c, bx + card_w/2, ly, line, "PopB", 9, col, "center")
-            ly -= 14
-    y = card_y - card_h - 20
+        c.circle(circle_cx, circle_cy, 12, fill=1, stroke=0)
+        c.setFont("PopB", 10); c.setFillColor(WHITE)
+        c.drawCentredString(circle_cx, circle_cy - 4, num)
+        # Lines of text
+        text_color = WHITE if i == 2 else TEAL_MED
+        c.setFont("PopB", 9.5); c.setFillColor(text_color)
+        c.drawCentredString(bx + card_w/2, y - 42, line1)
+        if line2:
+            c.drawCentredString(bx + card_w/2, y - 56, line2)
+    y -= card_h + 18
 
-    txt(c, W/2, y, "That's the whole instruction.", "PopI", 11, TEXT_GRAY, "center")
-    y -= 28
+    # Subline
+    c.setFont("PopI", 10.5); c.setFillColor(TEXT_GRAY)
+    c.drawCentredString(W/2, y, "That's the whole instruction.")
+    y -= 26
 
-    # Tips — dark card
-    tip_h = 72
+    # Tips card
+    tip_h = 74
     c.setFillColor(HexColor("#252527"))
     c.roundRect(M, y - tip_h, CW, tip_h, 10, fill=1, stroke=0)
-    accent_bar(c, M, y, tip_h, TEAL, 4)
-    txt(c, M + 16, y - 14, "TIPS FOR THE BEST VIEW", "PopB", 8.5, TEAL)
-    for ti, tip in enumerate([
-        "Best nights: new moon nights, when the sky is at its darkest.",
-        "If your stay includes a new moon night, don't waste it.",
-        "Download Sky Map or Stellarium before you arrive — free apps, totally worth it.",
-    ]):
-        txt(c, M + 16, y - 28 - ti * 14, tip, "Pop", 8.8, HexColor("#9AAFBA"))
+    # Left teal accent bar
+    c.setFillColor(TEAL)
+    c.roundRect(M, y - tip_h, 4, tip_h, 2, fill=1, stroke=0)
+    # Tips content — x = M+16, wrap width = CW-22
+    c.setFont("PopB", 9); c.setFillColor(TEAL)
+    c.drawString(M + 16, y - 15, "TIPS FOR THE BEST VIEW")
+    tips = [
+        "Best nights are new moon nights — the sky is darkest then.",
+        "If your stay includes one, don't waste it.",
+        "Download Sky Map or Stellarium before you arrive — free and worth it.",
+    ]
+    for ti, tip in enumerate(tips):
+        c.setFont("Pop", 8.8); c.setFillColor(HexColor("#9AAFBA"))
+        c.drawString(M + 16, y - 30 - ti*15, tip)
     y -= tip_h + 16
 
-    # Footer
+    # Dark footer (no standard white footer on dark pages — use dark version)
     c.setStrokeColor(HexColor("#2A2A2C")); c.setLineWidth(0.5)
     c.line(M, 0.56*inch, M + CW, 0.56*inch)
-    txt(c, W/2, 0.36*inch,
-        "Casa Mañana  ·  West Bay, Roatán  ·  casamananaroatan.com",
-        "PopL", 7, HexColor("#3A4A50"), "center")
-    txt(c, W - M, 0.36*inch, "15", "PopL", 7.5, HexColor("#3A4A50"), "right")
+    c.setFont("PopL", 7); c.setFillColor(HexColor("#3A4A50"))
+    c.drawCentredString(W/2, 0.36*inch,
+        "Casa Mañana  ·  West Bay, Roatán  ·  casamananaroatan.com")
+    c.setFont("PopL", 7.5)
+    c.drawRightString(W - M, 0.36*inch, "15")
 
 
 # ── 16. PRACTICAL INFO ──────────────────────────────────────────────────────
