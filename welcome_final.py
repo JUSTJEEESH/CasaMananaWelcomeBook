@@ -333,8 +333,8 @@ def pg_first_day(c):
     y = H - 1.28*inch
 
     steps = [
-        ("2:00 PM", "Arrive & Decompress",
-         "Drop your bags. Change into something lighter than whatever you flew in. "
+        ("3:00 PM", "Arrive & Decompress",
+         "Check-in starts at 3:00. Change into something lighter than whatever you flew in. "
          "Do a lap around the property. Jump in the pool. "
          "Let the island catch up to you. You don't need to do anything yet."),
         ("4:00 PM", "Walk to the Beach",
@@ -419,7 +419,7 @@ def pg_house(c):
     y = wraptext(c, M, y,
         "We use a smart lock — no key to lose, no one to wait for. "
         "Your code arrives a few days before check-in. "
-        "Early check-in or late checkout? Just ask — we'll always do our best.",
+        "Check-in starts at 3:00 PM unless discussed prior. Late checkout? Just ask.",
         "Pop", 9.3, TEXT_GRAY, CW, 14); y -= 16
 
     col = (CW - 16) / 2
@@ -459,7 +459,8 @@ def pg_house(c):
     y_r -= 8
 
     y_r = sec(rx, y_r, "Climate",
-        "Bedroom and living area have AC. The covered porch is open-air with great airflow. "
+        "Bedroom and living area have AC. Please turn it off when you leave — "
+        "electricity is expensive on the island. The covered porch is open-air with great airflow. "
         "Ceiling fans throughout. Light clothes, AC when you want it.", col)
 
     y_r = sec(rx, y_r, "Security Cameras",
@@ -573,7 +574,7 @@ def pg_getting_around(c):
         "Easy to find throughout West Bay, especially near West Bay Mall.",
         "Pop", 9, TEXT_GRAY, col, 13.5); y_l -= 10
     for label, price in [("West Bay to West End", "$5–8 per person"),
-                         ("West Bay to Airport", "$20–25"),
+                         ("West Bay to Airport", "$25–30"),
                          ("Island tour (half day)", "$75+")]:
         y_l = dashed_price_row(c, lx, y_l, col, label, price)
     y_l -= 8
@@ -595,7 +596,7 @@ def pg_getting_around(c):
 
     y_r = subhead(c, rx, y_r, "The Airport")
     y_r = wraptext(c, rx, y_r,
-        "Roatán International (RTB) is in Coxen Hole, 20–30 minutes from the house. "
+        "Roatán International (RTB) is in Coxen Hole, 30–35 minutes from the house. "
         "Need a transfer? Ask us — we work with a reliable driver.",
         "Pop", 9, TEXT_GRAY, col, 13.5); y_r -= 12
 
@@ -702,15 +703,21 @@ def pg_food_wb(c):
 
     y = restaurant_entry(c, M, y, CW, "Bananarama / Thirsty Turtle Bar & Grill",
         "West Bay Beach · At Bananarama Dive Resort",
-        ["Most energetic spot on the beach. 2-for-1 happy hour 4–6 PM.",
+        ["Most energetic spot on the beach. 2-for-1 happy hour 4–6 PM. $2 beers on Sundays.",
          "Hermit crab races (charity), fire dancers, karaoke, live music. Great fish tacos."],
         "Open daily · Cash & cards", TEAL)
 
-    y = restaurant_entry(c, M, y, CW, "Roa Market",
-        "Next door to Beachers",
-        ["Best selection in West Bay. Good for anything out of the ordinary.",
-         "Prices are a bit higher — but it's right here and very convenient."],
-        None, TEAL)
+    y = restaurant_entry(c, M, y, CW, "Kristie's Island Kitchen",
+        "West Bay · Local favorite",
+        ["Amazing home-style island food. The kind of place locals actually eat at.",
+         "Great portions, great flavor, great value. Don't miss it."],
+        "Cash & cards", TEAL)
+
+    y = restaurant_entry(c, M, y, CW, "Bean Crazy",
+        "Across from West Bay Mall",
+        ["Good coffee, smoothies, and light bites. Convenient location right in the heart of West Bay.",
+         "A solid go-to when you want something quick and easy."],
+        "Cash & cards", TEAL)
 
     footer(c, 8)
 
@@ -737,13 +744,13 @@ def pg_food_we(c):
         "Run by Tim & Shantal · Texan expats · West End",
         ["The Motherclucker — Josh's personal favorite dish on the entire island. Full stop.",
          "Also: smoked brisket, legendary cinnamon rolls, the Dirty Bird sandwich.",
-         "Texas-sized portions — one entrée easily feeds two. Only 10–12 seats. Go early."],
+         "Texas-sized portions — one entrée easily feeds two. If there's a line (and there will be), it moves fast."],
         "Mon–Fri 8–3 PM · Sat 8–2 & 4–8 PM · Closed Sun · Cash, Venmo, PayPal", PINK)
 
     y = restaurant_entry(c, M, y, CW, "Ginger's Caribbean Grill",
         "Owned by Ginger & Jeff · Half Moon Bay, West End",
         ["Fresh seafood from local fishermen — sustainable catches only.",
-         "The bang bang shrimp and shrimp po'boy are both exceptional.",
+         "The snapper sandwich is Pamela's favorite thing on the menu. Bang bang shrimp is exceptional.",
          "Lionfish tacos: invasive species, delicious solution, good for the reef."],
         "Beautiful waterfront setting · Cash & cards", PINK)
 
