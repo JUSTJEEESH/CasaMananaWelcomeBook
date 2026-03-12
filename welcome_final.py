@@ -174,7 +174,7 @@ def two_col(items_left, items_right):
 def subhead(c, x, y, label, col=CHARCOAL):
     txt(c, x, y, label, "PopB", 10.5, col)
     teal_underline(c, x, y, label, "PopB", 10.5)
-    return y - 18
+    return y - 20
 
 def dashed_price_row(c, x, y, w, label, price, label_font="Pop", price_font="PopM"):
     txt(c, x, y, label, label_font, 9.2, CHARCOAL)
@@ -188,21 +188,21 @@ def dashed_price_row(c, x, y, w, label, price, label_font="Pop", price_font="Pop
 
 def restaurant_entry(c, x, y, w, name, detail, lines, hours=None, accent=TEAL):
     """Restaurant listing with left accent bar."""
-    total_h = 14 + (12 if detail else 0) + len(lines) * 13 + (12 if hours else 0) + 4
-    accent_bar(c, x, y, total_h, accent, 3.5)
     cx = x + 12
-    txt(c, cx, y, name, "PopB", 11, CHARCOAL)
-    y -= 13
+    text_w = w - 16  # available width for text
+    start_y = y
+    # Name
+    y = wraptext(c, cx, y, name, "PopB", 10, CHARCOAL, text_w, 13)
     if detail:
-        txt(c, cx, y, detail, "PopI", 8.5, TEXT_GRAY)
-        y -= 12
+        y = wraptext(c, cx, y, detail, "PopI", 8.2, TEXT_GRAY, text_w, 12)
     for line in lines:
-        txt(c, cx, y, line, "Pop", 9, CHARCOAL)
-        y -= 13
+        y = wraptext(c, cx, y, line, "Pop", 8.5, CHARCOAL, text_w, 12)
     if hours:
-        txt(c, cx, y, hours, "Pop", 7.8, TEXT_GRAY)
-        y -= 12
-    return y - 10
+        y = wraptext(c, cx, y, hours, "Pop", 7.5, TEXT_GRAY, text_w, 11)
+    # Draw accent bar based on actual height used
+    total_h = start_y - y + 4
+    accent_bar(c, x, start_y, total_h, accent, 3.5)
+    return y - 14  # generous spacing between entries
 
 def check_item(c, x, y, text_str, w, col=TEAL):
     """Checkmark bullet item."""
@@ -330,7 +330,7 @@ def pg_first_day(c):
     section_header(c, "Your First Day",
                    "If you need a plan — and most people do — here's ours.",
                    bg=TEAL, sub_col=HexColor("#C0E8E4"))
-    y = H - 1.12*inch
+    y = H - 1.28*inch
 
     steps = [
         ("2:00 PM", "Arrive & Decompress",
@@ -475,7 +475,7 @@ def pg_rules(c):
     section_header(c, "House Rules",
                    "Short, honest, and not gotchas — just good-neighbor stuff.",
                    bg=PINK, sub_col=HexColor("#F9C0D3"))
-    y = H - 1.12*inch
+    y = H - 1.3*inch
     col = (CW - 16) / 2
     lx, rx = M, M + col + 16
 
@@ -513,7 +513,7 @@ def pg_rules(c):
         txt(c, tx + 8, ty - 8.5, str(i+1), "PopB", 7.5, WHITE, "center")
         txt(c, tx + 21, ty, bold, "PopB", 9.2, CHARCOAL)
         ny = wraptext(c, tx + 21, ty - 13, body, "Pop", 8.8, TEXT_GRAY, col - 21, 13)
-        ny -= 10
+        ny -= 14
         if i % 2 == 0: y_l = ny
         else: y_r = ny
 
@@ -615,7 +615,7 @@ def pg_mistakes(c):
     section_header(c, "Don't Make These Mistakes",
                    "We say this with love. We've watched a lot of guests learn these the hard way.",
                    bg=CHARCOAL)
-    y = H - 1.1*inch
+    y = H - 1.3*inch
     col = (CW - 16) / 2
     lx, rx = M, M + col + 16
 
@@ -659,7 +659,7 @@ def pg_mistakes(c):
         txt(c, tx + pw/2, ty - 12.5, str(i+1), "PopB", 8, WHITE, "center")
         txt(c, tx + pw + 8, ty - 4, title, "PopB", 9.2, CHARCOAL)
         ny = wraptext(c, tx + pw + 8, ty - 17, body, "Pop", 8.8, TEXT_GRAY, col - pw - 8, 13)
-        ny -= 10
+        ny -= 14
         if i % 2 == 0: y_l = ny
         else: y_r = ny
 
@@ -672,7 +672,7 @@ def pg_food_wb(c):
     c.setFillColor(TEAL); c.rect(0, H - 4, W, 4, fill=1, stroke=0)
     y = H - 0.68*inch
     y = pill_label(c, M, y, "FOOD & DRINK")
-    txt(c, M, y, "Where to Eat & Drink", "PopB", 30, CHARCOAL); y -= 10
+    txt(c, M, y, "Where to Eat & Drink", "PopB", 28, CHARCOAL); y -= 10
     txt(c, M, y - 4, "We've eaten our way around this island. Here's the honest list.", "Pop", 10, TEXT_GRAY)
     y -= 22; hrule(c, M, y, CW, BORDER_SOFT); y -= 12
 
@@ -782,7 +782,7 @@ def pg_people(c):
     section_header(c, "The People Behind Your Favorite Spots",
                    "Roatán's best spots are run by people who chose this place on purpose.",
                    bg=TEAL, sub_col=HexColor("#B8E6E1"))
-    y = H - 1.1*inch
+    y = H - 1.3*inch
     col = (CW - 16) / 2
     lx, rx = M, M + col + 16
 
@@ -814,7 +814,7 @@ def pg_people(c):
         txt(c, tx, ty, place, "Pop", 8.5, TEAL); ty -= 5
         hrule(c, tx, ty, col, BORDER_SOFT); ty -= 11
         ty = wraptext(c, tx, ty, body, "Pop", 9, TEXT_GRAY, col, 13.5)
-        ty -= 16
+        ty -= 20
 
         if i % 2 == 0: y_l = ty
         else: y_r = ty
@@ -896,7 +896,7 @@ def pg_reef(c):
     section_header(c, "What You Might See Out There",
                    "A quick guide to the reef — so you know what you're looking at.",
                    bg=TEAL, sub_col=HexColor("#B8E6E1"))
-    y = H - 1.08*inch
+    y = H - 1.28*inch
     col = (CW - 16) / 2
     lx, rx = M, M + col + 16
 
@@ -1021,7 +1021,7 @@ def pg_rainy(c):
     section_header(c, "What to Do on a Rainy Afternoon",
                    "It happens. Usually clears in an hour. Here's what we'd do.",
                    bg=CHARCOAL, sub_col=TEXT_GRAY)
-    y = H - 1.1*inch
+    y = H - 1.3*inch
     col = (CW - 16) / 2
     lx, rx = M, M + col + 16
 
@@ -1258,7 +1258,7 @@ def pg_faq(c):
     section_header(c, "Questions You Might Have   But Were Too Polite to Ask",
                    "We've been asked every single one of these.",
                    bg=CHARCOAL)
-    y = H - 1.1*inch
+    y = H - 1.3*inch
     col = (CW - 16) / 2
     lx, rx = M, M + col + 16
 
