@@ -141,8 +141,11 @@ def pill_label(c, x, y, label, bg=PINK_SOFT, fg=PINK):
     c.setFont("PopM", 7.5)
     c.setFillColor(fg)
     c.drawString(x + 11, pill_bottom + 5, label)
-    # Return y for heading baseline (8pt below pill bottom)
-    return pill_bottom - 8
+    # Return y for heading baseline — must be low enough that the heading's
+    # ascenders (which rise ABOVE the baseline) don't overlap the pill.
+    # For a 36pt heading, ascent ≈ 27pt. pill_bottom - 32 puts heading top
+    # at pill_bottom - 32 + 27 = pill_bottom - 5, safely below the pill.
+    return pill_bottom - 32
 
 def dark_band(c, y, h, col=CHARCOAL):
     c.setFillColor(col); c.rect(0, y, W, h, fill=1, stroke=0)
@@ -153,7 +156,11 @@ def section_header(c, title, subtitle=None,
     bh = h or (1.05*inch if subtitle else 0.85*inch)
     dark_band(c, H - bh, bh, bg)
     ty = H - bh/2 - 7
-    txt(c, M, ty + (10 if subtitle else 0), title, "PopB", 22, title_col)
+    # Auto-shrink title to fit within content width
+    title_size = 22
+    while c.stringWidth(title, "PopB", title_size) > CW and title_size > 14:
+        title_size -= 0.5
+    txt(c, M, ty + (10 if subtitle else 0), title, "PopB", title_size, title_col)
     if subtitle:
         txt(c, M, ty - 10, subtitle, "PopL", 9, sub_col or TEXT_GRAY)
 
